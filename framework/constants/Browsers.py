@@ -1,0 +1,7 @@
+BROWSER_CHROME = "chrome"
+BROWSER_FIREFOX = "firefox"
+IE = "ie"
+BROWSER_SAFARI = "safari"
+BROWSER_REMOTE = "remote"
+BROWSER_IOS = "iOS"
+BROWSER_ANDROID = "Android"

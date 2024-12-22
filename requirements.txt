@@ -1,0 +1,10 @@
+pytest==3.8.1
+pytest-allure-adaptor==1.7.10
+allure-python-commons==2.5.2
+webdriver-manager==1.7
+selenium==3.14.1
+PyHamcrest==1.9.0
+dpath==1.4.2
+Pillow==5.3.0
+axe-selenium-python==2.1.2
+

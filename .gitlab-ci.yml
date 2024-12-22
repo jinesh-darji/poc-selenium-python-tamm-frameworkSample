@@ -1,0 +1,47 @@
+variables:
+  PYPI_SERVER: https://pypi.digitalx1.io
+  PYPI_INDEX: qa/development
+  PYPI_USER: qa
+  PYPI_PASSWORD: myWSEHelEmOWpmys
+  SLACK_CHANNEL: qa
+  SLACK_USER: Deploy-Bot
+
+stages:
+  - test
+  - build-push
+  - slack-notification
+
+qa:
+  stage: test
+  script:
+    - ls -la
+  allow_failure: true
+  tags:
+    - service-k8s-runner
+
+build:ms:development:
+ stage: build-push
+ script:
+  - devpi login $PYPI_USER --password=$PYPI_PASSWORD
+  - devpi use $PYPI_SERVER/$PYPI_INDEX
+  - python setup.py sdist
+  - devpi upload --from-dir dist
+  - devpi list
+ only:
+  - /^pretest-.*$/
+ tags:
+   - service-k8s-runner
+
+slack-success-notification:
+  stage: slack-notification
+  script:
+    - echo "New version of dx1-qa-framework uploaded to \`$PYPI_SERVER\` successfully " | /usr/local/bin/slacktee -u $SLACK_USER  -c $SLACK_CHANNEL -a "good" -t "Upload Notification" -e "Deployer" $GITLAB_USER_LOGIN -e "TAG" $CI_BUILD_TAG  -q -p
+  allow_failure: true
+  only:
+    - tags
+
+slack-failure-notification:
+  stage: slack-notification
+  when: on_failure
+  script:
+    - echo "Pipeline on \`$CI_PROJECT_NAME\` failed" | /usr/local/bin/slacktee -u $SLACK_USER  -c $SLACK_CHANNEL -a "danger" -t "Pipeline Failure Notification" -e "Deployer" $GITLAB_USER_LOGIN  -e "URL" "https://gitlab.digitalx1.io/$CI_PROJECT_PATH/pipelines/$CI_PIPELINE_ID" -p -q
